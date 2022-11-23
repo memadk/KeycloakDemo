@@ -8,18 +8,28 @@ using System.Security.Claims;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddOpenIdConnect("keycloak", options =>
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+})
+.AddCookie(options => 
+{
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+})
+.AddOpenIdConnect(options =>
     {
-        options.SignInScheme = "Identity.External";
-        options.Authority = "http://localhost:8080/auth/realms/Test";
+        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.Authority = "http://keycloak:8080/auth/realms/Test";
         options.ClientId = "test-client";
         options.RequireHttpsMetadata = false;
         options.SaveTokens = true;
         options.Scope.Add("openid");
         options.Scope.Add("profile");
-        options.ClientSecret = "4o4IzKdWTaJ4ir6iCdKjVXDhWoDiq3Zo";
-        options.MetadataAddress = "http://localhost:8080/auth/realms/Test/.well-known/openid-configuration";
+        options.Scope.Add("roles");
+        options.ClientSecret = "gQBAPU0LRi9RGk2WqNXlLHdBzYsrWsly";
+        options.MetadataAddress = "http://keycloak:8080/auth/realms/Test/.well-known/openid-configuration";
         options.GetClaimsFromUserInfoEndpoint = true;
         options.ResponseType = OpenIdConnectResponseType.Code;
         options.TokenValidationParameters = new TokenValidationParameters
@@ -34,7 +44,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization(options =>
 {
     // By default, all incoming requests will be authorized according to the default policy.
-    options.FallbackPolicy = options.DefaultPolicy;
+    //options.FallbackPolicy = options.DefaultPolicy;
 });
 builder.Services.AddRazorPages()
     .AddMicrosoftIdentityUI();
