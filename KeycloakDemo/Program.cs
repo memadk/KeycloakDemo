@@ -21,15 +21,15 @@ builder.Services.AddAuthentication(options =>
 .AddOpenIdConnect(options =>
     {
         options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-        options.Authority = "http://keycloak:8080/auth/realms/Test";
-        options.ClientId = "test-client";
+        options.Authority = builder.Configuration["OpenId:Authority"];
+        options.ClientId = builder.Configuration["OpenId:ClientId"];
         options.RequireHttpsMetadata = false;
         options.SaveTokens = true;
         options.Scope.Add("openid");
         options.Scope.Add("profile");
         options.Scope.Add("roles");
-        options.ClientSecret = "gQBAPU0LRi9RGk2WqNXlLHdBzYsrWsly";
-        options.MetadataAddress = "http://keycloak:8080/auth/realms/Test/.well-known/openid-configuration";
+        options.ClientSecret = builder.Configuration["OpenId:ClientSecret"];
+        options.MetadataAddress = builder.Configuration["OpenId:MetaAddress"];
         options.GetClaimsFromUserInfoEndpoint = true;
         options.ResponseType = OpenIdConnectResponseType.Code;
         options.TokenValidationParameters = new TokenValidationParameters
